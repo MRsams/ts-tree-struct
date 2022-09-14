@@ -1,0 +1,9 @@
+node_modules
+.idea
+.git
+.npmignore
+test.ts
+test.js
+src/Tree.js
+src/TreeNode.js
+index.js
