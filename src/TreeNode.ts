@@ -1,5 +1,6 @@
 export class TreeNode {
-    public children: TreeNode[] = [];
+    protected _children: TreeNode[] = [];
+    protected _childrenCount: number = 0;
     constructor(
        public key: string | number,
        public data: any = key,
@@ -10,33 +11,54 @@ export class TreeNode {
     }
 
     get isLeaf() {
-        return this.children.length === 0;
+        return this._children.length === 0;
     }
 
     get hasChildren() {
         return !this.isLeaf;
     }
 
+    get childrenCount(){
+        return this._childrenCount
+    }
+
+    childAt(index: number){
+        if(index >= 0 && index < this._childrenCount)
+            return this._children[index];
+    }
+
+    *children() {
+        for(let i = 0; i < this._children.length; i++)
+            yield this._children[i];
+    }
+
     removeChild(key: string | number){
-        const index = this.children.findIndex((node) => node.key === key);
-        this.children.splice(index, 1);
+        const index = this._children.findIndex((node) => node.key === key);
+        if(index !== -1) {
+            this.removeChildAt(index)
+        }
         return this;
     }
 
     removeChildAt(index: number){
-        this.children.splice(index, 1);
+        if(index >= 0 && index < this._childrenCount) {
+            this._children.splice(index, 1);
+            this._childrenCount--;
+        }
         return this;
     }
 
     insertChild(node: TreeNode){
         node.parent = this;
-        this.children.push(node);
+        this._children.push(node);
+        this._childrenCount++
         return this;
     }
 
     insertChildAt(node: TreeNode, index: number){
         node.parent = this;
-        this.children.splice(index, 0, node);
+        this._children.splice(index, 0, node);
+        this._childrenCount++
         return this;
     }
 }

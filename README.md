@@ -39,12 +39,12 @@ const tree = new Tree(
     key: 'root',
     data: { foo: 'bar' },
     parent: undefined,
-        children: [
+        _children: [
         {
             key: 'node#1',
             data: { foo: 'bir' },
             parent: *this*,
-            children: []
+            _children: []
         }
     ]
 }
@@ -62,9 +62,9 @@ const tree = new Tree(
         key: 'root',
         data: { foo: 'bar' },
         parent: undefined,
-        children: [ *this* ]
+        _children: [ *this* ]
     },
-    children: []
+    _children: []
 }
 ```
 
@@ -80,9 +80,9 @@ const tree = new Tree(
         key: 'root',
         data: { foo: 'bar' },
         parent: undefined,
-        children: [ *this* ]
+        _children: [ *this* ]
     },
-    children: []
+    _children: []
 }
 ```
 
@@ -96,7 +96,7 @@ const tree = new Tree(
         key: 'root',
         data: { foo: 'bar' },
         parent: undefined,
-        children: [
+        _children: [
             {
                 key: 'node#1',
                 data: { foo: 'bir' },
@@ -104,9 +104,9 @@ const tree = new Tree(
                     key: 'root',
                     data: { foo: 'bar' },
                     parent: undefined,
-                    children: [ *this* ]
+                    _children: [ *this* ]
                 },
-                children: []
+                _children: []
             }
         ]
     },
@@ -117,9 +117,9 @@ const tree = new Tree(
             key: 'root',
             data: { foo: 'bar' },
             parent: undefined,
-            children: [ *this* ]
+            _children: [ *this* ]
         },
-        children: []
+        _children: []
     }
 ]
 ```
@@ -136,17 +136,17 @@ const tree = new Tree(
     key: 'root',
     data: { foo: 'bar' },
     parent: undefined,
-    children: [
+    _children: [
         {
             key: 'node#1',
             data: { foo: 'bir' },
             parent: *root*,
-            children: [
+            _children: [
                 {
                     key: 'node#2',
                     data: { foo: 'bor' },
                     parent: *node#1*,
-                    children: []
+                    _children: []
                 }
             ]
         }
@@ -163,16 +163,60 @@ const tree = new Tree(
     key: 'root',
     data: { foo: 'bar' },
     parent: undefined,
-    children: [
+    _children: [
         {
             key: 'node#1',
             data: { foo: 'bir' },
             parent: *root*,
-            children: []
+            _children: []
         }
     ]
 }
 ```
+
+### Traversing
+
+This is the signature of the traverse function
+
+```typescript
+traverse(
+    walker: {
+        onEnter: (node: TreeNode, context?: Record<string, any>) => unknown
+        onLeave?: (node: TreeNode, context?: Record<string, any>) => unknown
+    },
+    context: Record<string, any> = {},
+    node: TreeNode = this.root
+): Record<string, any>
+```
+`walker`: required, an object that must contains an 'onEnter' function and on optional 'onLeave' function.
+The node that is currently analysed is passed as first argument and the context object as second argument;
+
+`context`: optional, default as {}, an object that is passed to every walker's call. Useful to pass initial variables or to hold temporary values;
+
+`node`: tree node that represent the entry point of traversing.
+
+an example of tree traversing is the `Tree.count` function: 
+
+```typescript
+count(): number {
+    const context = {count: 0}
+    this.traverse(
+        {
+            onEnter: (node, context ?) => {
+                    context.count += [...node.children()].length;
+            },
+            onLeave: (node, context?) => {
+                console.log(`leave ${node.key}`, context)
+                if (context && context.count !== undefined && !node.parent)
+                    context.count += 1;
+            },
+        },
+        context
+    )
+    return context.count;
+}
+```
+
 
 ### Iterate tree
 
@@ -203,9 +247,36 @@ const tree = new Tree(
 ```
 
 ```typescript
-> tree.root.children[0].isLeaf 
+> tree.root.childAt(0).isLeaf 
 
 > true
+```
+
+```typescript
+> tree.root.childrenCount
+
+> 2
+```
+
+### Access child at index
+
+```typescript
+> tree.root.childAt(0)
+
+> {
+    key: 'node#1',
+    data: { foo: 'bir' },
+    parent: {
+        key: 'root', 
+        data: { foo: 'bar' },
+        parent: undefined,
+        _children: [ *this* ],
+        _childCount: 1
+    },
+    _children: [],
+    _childCount: 0
+}
+
 ```
 
 ### Access parent
@@ -217,12 +288,12 @@ const tree = new Tree(
     key: 'root',
     data: { foo: 'bar' },
     parent: undefined,
-    children: [
+    _children: [
         {
             key: 'node#1',
             data: { foo: 'bir' },
             parent: *root*,
-            children: []
+            _children: []
         }
     ]
 }
