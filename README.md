@@ -203,12 +203,11 @@ count(): number {
     this.traverse(
         {
             onEnter: (node, context ?) => {
-                    context.count += [...node.children()].length;
+                context!.count += node.childrenCount;
             },
             onLeave: (node, context?) => {
-                console.log(`leave ${node.key}`, context)
-                if (context && context.count !== undefined && !node.parent)
-                    context.count += 1;
+                if (!node.parent)
+                    context!.count += 1;
             },
         },
         context
