@@ -82,7 +82,7 @@ export class Tree {
         const context = {count: 0}
         this.traverse(
             {
-                onEnter: (node, context ?) => {
+                onEnter: (node, context?) => {
                     context!.count += node.childrenCount;
                 },
                 onLeave: (node, context?) => {

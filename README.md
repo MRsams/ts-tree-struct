@@ -193,7 +193,7 @@ The node that is currently analysed is passed as first argument and the context 
 
 `context`: optional, default as {}, an object that is passed to every walker's call. Useful to pass initial variables or to hold temporary values;
 
-`node`: tree node that represent the entry point of traversing.
+`node`: optional, default tree.root, tree node that represent the entry point of traversing.
 
 an example of tree traversing is the `Tree.count` function: 
 
@@ -202,7 +202,7 @@ count(): number {
     const context = {count: 0}
     this.traverse(
         {
-            onEnter: (node, context ?) => {
+            onEnter: (node, context?) => {
                 context!.count += node.childrenCount;
             },
             onLeave: (node, context?) => {
